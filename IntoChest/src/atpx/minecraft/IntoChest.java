@@ -27,7 +27,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 	private final long interval = 1000;
 
 	private final ArrayList<Block> visitedB = new ArrayList<Block>();
-	private final HashMap<String, ArrayList<Integer>> shortKeyValue = new HashMap<String, ArrayList<Integer>>();
+	private final HashMap<String, ArrayList<String>> shortKeyValue = 
+			new HashMap<String, ArrayList<String>>();
 
 	private CommandSender debugClient;
 	private boolean debugInfo, runtime;
@@ -46,40 +47,52 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 
 	public void onEnable() {
 		pdf = getDescription();
-		logger.info(pdf.getName() + " version " + pdf.getVersion() + " is now enabled.");
-		getServer().getScheduler().scheduleSyncRepeatingTask(this, this, 100L, interval * 20L / 1000L);
+		logger.info(pdf.getName() + " version " + pdf.getVersion() + 
+		" is now enabled.");
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, this, 100L, 
+		interval * 20L / 1000L);
 	}
 
 	@Override
-	public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
+	public boolean onCommand(final CommandSender sender, 
+													 final Command command, 
+													 final String label, 
+													 final String[] args) {
 		if (command.getName().equals("intochest")) {
 			if (sender != null) {
 				logger.info(pdf.getName() + ": '" + sender.getName() + "' called.");
 				// If someone switches while it's already active
 				if (debugClient != null && !debugClient.equals(sender))
-					debugClient.sendMessage(ChatColor.RED + pdf.getName() + ": " + ChatColor.GOLD + "'" + sender.getName() + "' called.");
+					debugClient.sendMessage(ChatColor.RED + pdf.getName() + ": " + 
+					ChatColor.GOLD + "'" + sender.getName() + "' called.");
 				if (!"CONSOLE".equals(sender.getName()))
 					debugClient = sender;
 			}
 			if (args.length == 2 &&
-					(args[0].toLowerCase().equals("runtime") || args[0].toLowerCase().equals("debug")) &&
-					(args[1].toLowerCase().equals("on") || args[1].toLowerCase().equals("off"))) {
+					(args[0].toLowerCase().equals("runtime") || 
+					 args[0].toLowerCase().equals("debug")) &&
+					(args[1].toLowerCase().equals("on") || 
+					 args[1].toLowerCase().equals("off"))) {
 				if (args[0].toLowerCase().equals("runtime")) {
 					runtime = args[1].toLowerCase().equals("on");
 					if (debugClient != null)
 						debugClient.sendMessage(
-								ChatColor.RED + pdf.getName() + ": " + ChatColor.GOLD + "You " + (runtime ? "" : "de") + "activated runtime-monitoring."
+								ChatColor.RED + pdf.getName() + ": " + ChatColor.GOLD + 
+								"You " + (runtime ? "" : "de") + "activated runtime-monitoring."
 						);
 					if (sender != null)
-						logger.info(pdf.getName() + ": '" + sender.getName() + "' " + (runtime ? "" : "de") + "activated runtime-monitoring.");
+						logger.info(pdf.getName() + ": '" + sender.getName() + "' " + 
+					  (runtime ? "" : "de") + "activated runtime-monitoring.");
 				} else {
 					debugInfo = args[1].toLowerCase().equals("on");
 					if (debugClient != null)
 						debugClient.sendMessage(
-								ChatColor.RED + pdf.getName() + ": " + ChatColor.GOLD + "You " + (debugInfo ? "" : "de") + "activated debugging-infos."
+								ChatColor.RED + pdf.getName() + ": " + ChatColor.GOLD + 
+								"You " + (debugInfo ? "" : "de") + "activated debugging-infos."
 						);
 					if (sender != null)
-						logger.info(pdf.getName() + ": '" + sender.getName() + "' " + (debugInfo ? "" : "de") + "activated debugging-infos.");
+						logger.info(pdf.getName() + ": '" + sender.getName() + "' " + 
+					  (debugInfo ? "" : "de") + "activated debugging-infos.");
 				}
 				return true;
 			}
@@ -90,7 +103,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 	public void debug(final String text) {
 		if (debugInfo) {
 			if (debugClient != null)
-				debugClient.sendMessage(ChatColor.RED + pdf.getName() + ": " + ChatColor.GRAY + text);
+				debugClient.sendMessage(ChatColor.RED + pdf.getName() + ": " + 
+			  ChatColor.GRAY + text);
 			else
 				logger.info(pdf.getName() + ": " + text);
 		}
@@ -104,23 +118,36 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 				for (final Entity entity : world.getEntities()) {
 					if (entity instanceof Item) {
 						final Item item = (Item) entity;
-						Block workB = item.getLocation().getBlock().getRelative(BlockFace.DOWN);
+						Block workB = 
+								item.getLocation().getBlock().getRelative(BlockFace.DOWN);
 						if (workB.getType() == Material.WORKBENCH) {
 							final ItemStack itemStack = item.getItemStack();
 							final int itemTypeId = itemStack.getTypeId();
-							debug("Processing Item: " + ITEMNAMES.get(itemTypeId) + "/" + itemStack.getData().getData());
+							final int itemDataVal = itemStack.getData().getData();
+							debug("Processing Item: " + ITEMNAMES.get(itemTypeId + "|" + 
+									itemDataVal) + "/" + itemTypeId + "/" + itemDataVal);
+							debug("Item ID: " + itemStack.getTypeId());
+							debug("Item Data Value: " + itemStack.getData().getData());
+							debug("Item Name: " + ITEMNAMES.get(itemTypeId + "|" 
+									+ itemDataVal));
 							visitedB.clear(); // Flush list
 							wildcardB = null;
 							fullB = null;
-							workB = findNextEmptyContainer(workB, itemStack); // Check this and all linked other chests/dispensers
+						  // Check this and all linked other chests/dispensers
+							workB = findNextEmptyContainer(workB, itemStack); 
 							if (workB == null && fullB != null) {
-								debug("Moving Item onto chest/dispenser due to full: X" + fullB.getX() + "/Y" + fullB.getY() + "/Z" + fullB.getZ());
+								debug("Moving Item onto chest/dispenser due to full: X" + 
+							  fullB.getX() + "/Y" + fullB.getY() + "/Z" + fullB.getZ());
 								item.teleport(new Location(world, fullB.getX() + .5, fullB.getY() + 1, fullB.getZ() + .5));
 							} else if (workB == null && wildcardB != null) {
-								workB = findNextEmptyContainer(wildcardB, itemStack); // Check all linked chests/dispensers from wildcard
+						  	// Check all linked chests/dispensers from wildcard
+								workB = findNextEmptyContainer(wildcardB, itemStack); 
 							}
-							if (workB != null) { // Will return 'null' if no space left in chest/dispenser and linked chests/dispensers
-								debug("Storing in chest/dispenser: X" + workB.getX() + "/Y" + workB.getY() + "/Z" + workB.getZ());
+						  // Will return 'null' if no space left in chest/dispenser and 
+							// linked chests/dispensers
+							if (workB != null) {
+								debug("Storing in chest/dispenser: X" + workB.getX() + 
+										"/Y" + workB.getY() + "/Z" + workB.getZ());
 								addContents(workB, itemStack);
 								item.remove();
 							}
@@ -137,31 +164,40 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 			final long end = System.nanoTime();
 			final double duration = ((end - start) / 10000) / 100.0;
 			if (debugClient != null)
-				debugClient.sendMessage(ChatColor.RED + pdf.getName() + ": " + ChatColor.GRAY + duration + "ms");
+				debugClient.sendMessage(ChatColor.RED + pdf.getName() + ": " + 
+						ChatColor.GRAY + duration + "ms");
 			logger.info(pdf.getName() + ": " + duration + "ms");
 		}
 	}
 
-	public Block findNextEmptyContainer(final Block block, final ItemStack itemStack) {
+	public Block findNextEmptyContainer(final Block block, 
+																			final ItemStack itemStack) {
 		if (visitedB.contains(block))
 			return null;
 
-		if (block.getType() == Material.CHEST || block.getType() == Material.DISPENSER) {
+		if (block.getType() == Material.CHEST || 
+				block.getType() == Material.DISPENSER) {
 			if (isFull(getContents(block), itemStack)) {
-				debug("Skipping chest/dispenser due to full: X" + block.getX() + "/Y" + block.getY() + "/Z" + block.getZ());
+				debug("Skipping chest/dispenser due to full: X" + block.getX() + 
+						"/Y" + block.getY() + "/Z" + block.getZ());
 				fullB = block;
 			} else
 				return block;
 		}
 
-		if (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN) {
-			if (isAllowed((Sign) block.getState(), itemStack.getTypeId())) {
-				debug("Alowed via sign found at: X" + block.getX() + "/Y" + block.getY() + "/Z" + block.getZ());
+		if (block.getType() == Material.SIGN_POST || 
+				block.getType() == Material.WALL_SIGN) {
+			if (isAllowed((Sign) block.getState(), itemStack.getTypeId(), 
+					itemStack.getData().getData())) {
+				debug("Alowed via sign found at: X" + block.getX() + "/Y" + 
+					  block.getY() + "/Z" + block.getZ());
 			} else {
 				if (block.equals(wildcardB))
-					debug("YET skipping because wildcard was found at: X" + block.getX() + "/Y" + block.getY() + "/Z" + block.getZ());
+					debug("YET skipping because wildcard was found at: X" + 
+				      block.getX() + "/Y" + block.getY() + "/Z" + block.getZ());
 				else
-					debug("Skipping because not allowed via sign found at: X" + block.getX() + "/Y" + block.getY() + "/Z" + block.getZ());
+					debug("Skipping because not allowed via sign found at: X" + 
+				      block.getX() + "/Y" + block.getY() + "/Z" + block.getZ());
 				return null;
 			}
 		}
@@ -174,16 +210,22 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 
 		Block newBlock = block.getRelative(BlockFace.NORTH);
 		Material type = newBlock.getType();
-		if (type == Material.CHEST || type == Material.DISPENSER || type == Material.REDSTONE_WIRE || type == Material.SIGN_POST
-				|| type == Material.WALL_SIGN) {
+		if (type == Material.CHEST || 
+				type == Material.DISPENSER || 
+				type == Material.REDSTONE_WIRE || 
+				type == Material.SIGN_POST || 
+				type == Material.WALL_SIGN) {
 			final Block findBlock = findNextEmptyContainer(newBlock, itemStack);
 			if (findBlock != null)
 				return findBlock;
 		} else if (type == Material.AIR) { // Down one step
 			Block findBlock = newBlock.getRelative(BlockFace.DOWN);
 			final Material findType = findBlock.getType();
-			if (findType == Material.CHEST || findType == Material.DISPENSER || findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
-					|| findType == Material.WALL_SIGN) {
+			if (findType == Material.CHEST || 
+					findType == Material.DISPENSER || 
+					findType == Material.REDSTONE_WIRE || 
+					findType == Material.SIGN_POST || 
+					findType == Material.WALL_SIGN) {
 				findBlock = findNextEmptyContainer(findBlock, itemStack);
 				if (findBlock != null)
 					return findBlock;
@@ -191,8 +233,11 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 		} else if (aboveType == Material.AIR) { // Up one step
 			Block findBlock = aboveBlock.getRelative(BlockFace.NORTH);
 			final Material findType = findBlock.getType();
-			if (findType == Material.CHEST || findType == Material.DISPENSER || findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
-					|| findType == Material.WALL_SIGN) {
+			if (findType == Material.CHEST || 
+					findType == Material.DISPENSER || 
+					findType == Material.REDSTONE_WIRE || 
+					findType == Material.SIGN_POST ||
+					findType == Material.WALL_SIGN) {
 				findBlock = findNextEmptyContainer(findBlock, itemStack);
 				if (findBlock != null)
 					return findBlock;
@@ -201,16 +246,22 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 
 		newBlock = block.getRelative(BlockFace.EAST);
 		type = newBlock.getType();
-		if (type == Material.CHEST || type == Material.DISPENSER || type == Material.REDSTONE_WIRE || type == Material.SIGN_POST
-				|| type == Material.WALL_SIGN) {
+		if (type == Material.CHEST || 
+				type == Material.DISPENSER || 
+				type == Material.REDSTONE_WIRE || 
+				type == Material.SIGN_POST || 
+				type == Material.WALL_SIGN) {
 			final Block findBlock = findNextEmptyContainer(newBlock, itemStack);
 			if (findBlock != null)
 				return findBlock;
 		} else if (type == Material.AIR) { // Down one step
 			Block findBlock = newBlock.getRelative(BlockFace.DOWN);
 			final Material findType = findBlock.getType();
-			if (findType == Material.CHEST || findType == Material.DISPENSER || findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
-					|| findType == Material.WALL_SIGN) {
+			if (findType == Material.CHEST || 
+					findType == Material.DISPENSER || 
+					findType == Material.REDSTONE_WIRE || 
+					findType == Material.SIGN_POST || 
+					findType == Material.WALL_SIGN) {
 				findBlock = findNextEmptyContainer(findBlock, itemStack);
 				if (findBlock != null)
 					return findBlock;
@@ -218,8 +269,11 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 		} else if (aboveType == Material.AIR) { // Up one step
 			Block findBlock = aboveBlock.getRelative(BlockFace.EAST);
 			final Material findType = findBlock.getType();
-			if (findType == Material.CHEST || findType == Material.DISPENSER || findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
-					|| findType == Material.WALL_SIGN) {
+			if (findType == Material.CHEST || 
+					findType == Material.DISPENSER || 
+					findType == Material.REDSTONE_WIRE || 
+					findType == Material.SIGN_POST || 
+					findType == Material.WALL_SIGN) {
 				findBlock = findNextEmptyContainer(findBlock, itemStack);
 				if (findBlock != null)
 					return findBlock;
@@ -228,7 +282,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 
 		newBlock = block.getRelative(BlockFace.SOUTH);
 		type = newBlock.getType();
-		if (type == Material.CHEST || type == Material.DISPENSER || type == Material.REDSTONE_WIRE || type == Material.SIGN_POST
+		if (type == Material.CHEST || type == Material.DISPENSER || 
+				type == Material.REDSTONE_WIRE || type == Material.SIGN_POST
 				|| type == Material.WALL_SIGN) {
 			final Block findBlock = findNextEmptyContainer(newBlock, itemStack);
 			if (findBlock != null)
@@ -236,7 +291,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 		} else if (type == Material.AIR) { // Down one step
 			Block findBlock = newBlock.getRelative(BlockFace.DOWN);
 			final Material findType = findBlock.getType();
-			if (findType == Material.CHEST || findType == Material.DISPENSER || findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
+			if (findType == Material.CHEST || findType == Material.DISPENSER || 
+					findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
 					|| findType == Material.WALL_SIGN) {
 				findBlock = findNextEmptyContainer(findBlock, itemStack);
 				if (findBlock != null)
@@ -245,7 +301,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 		} else if (aboveType == Material.AIR) { // Up one step
 			Block findBlock = aboveBlock.getRelative(BlockFace.SOUTH);
 			final Material findType = findBlock.getType();
-			if (findType == Material.CHEST || findType == Material.DISPENSER || findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
+			if (findType == Material.CHEST || findType == Material.DISPENSER || 
+					findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
 					|| findType == Material.WALL_SIGN) {
 				findBlock = findNextEmptyContainer(findBlock, itemStack);
 				if (findBlock != null)
@@ -255,7 +312,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 
 		newBlock = block.getRelative(BlockFace.WEST);
 		type = newBlock.getType();
-		if (type == Material.CHEST || type == Material.DISPENSER || type == Material.REDSTONE_WIRE || type == Material.SIGN_POST
+		if (type == Material.CHEST || type == Material.DISPENSER || 
+				type == Material.REDSTONE_WIRE || type == Material.SIGN_POST
 				|| type == Material.WALL_SIGN) {
 			final Block findBlock = findNextEmptyContainer(newBlock, itemStack);
 			if (findBlock != null)
@@ -263,7 +321,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 		} else if (type == Material.AIR) { // Down one step
 			Block findBlock = newBlock.getRelative(BlockFace.DOWN);
 			final Material findType = findBlock.getType();
-			if (findType == Material.CHEST || findType == Material.DISPENSER || findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
+			if (findType == Material.CHEST || findType == Material.DISPENSER || 
+					findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
 					|| findType == Material.WALL_SIGN) {
 				findBlock = findNextEmptyContainer(findBlock, itemStack);
 				if (findBlock != null)
@@ -272,7 +331,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 		} else if (aboveType == Material.AIR) { // Up one step
 			Block findBlock = aboveBlock.getRelative(BlockFace.WEST);
 			final Material findType = findBlock.getType();
-			if (findType == Material.CHEST || findType == Material.DISPENSER || findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
+			if (findType == Material.CHEST || findType == Material.DISPENSER || 
+					findType == Material.REDSTONE_WIRE || findType == Material.SIGN_POST
 					|| findType == Material.WALL_SIGN) {
 				findBlock = findNextEmptyContainer(findBlock, itemStack);
 				if (findBlock != null)
@@ -283,31 +343,38 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 		return null;
 	}
 
-	private boolean isAllowed(final Sign sign, final int typeId) {
+	private boolean isAllowed(final Sign sign, 
+			                      final int typeId, 
+			                      final int dataVal) {
 		boolean retVal = true, fit = false;
-		for (String key : (sign.getLine(0) + " " + sign.getLine(1) + " " + sign.getLine(2) + " " + sign.getLine(3)).toLowerCase().split(",")) {
+		for (String key : (sign.getLine(0) + " " + sign.getLine(1) + " " + 
+		                   sign.getLine(2) + " " + 
+				               sign.getLine(3)).toLowerCase().split(",")) {
 			key = key.trim(); // Strip leading and trailing spaces...
 
-			Integer value = null;
-			if (key.equals(ITEMNAMES.get(typeId))) {
+			String value = "";
+			if (key.equals(ITEMNAMES.get(typeId + "|" + dataVal))) {
 				debug("Fit via exact name: " + key);
-				value = typeId;
+				value = key;
 			} else if (isValueForShortKey(key, typeId)) {
 				debug("Fit via short name: " + key + " -> " + ITEMNAMES.get(typeId));
-				value = getValueForShortKey(key, typeId);
+				value = key;
 			}
-			if (value == null && key.matches("^\\d+$")) { // Block/Item decimal number
+			if (value == null && key.equals(typeId + "|" + dataVal)) { // Block/Item decimal number
 				debug("Fit via id: " + key);
-				value = Integer.parseInt(key);
+				value = key;
 			}
 
+			
 			if (value != null) {
-				retVal &= (value == typeId);
+				retVal &= (value == (typeId+"|"+dataVal));
 				fit = true;
 			}
+	
 
 			if (key.matches("^\\*$")) { // Wildcard sign, means "if nothing else matches"
-				debug("We have a wildcard! X" + sign.getBlock().getX() + "/Y" + sign.getBlock().getY() + "/Z" + sign.getBlock().getZ());
+				debug("We have a wildcard! X" + sign.getBlock().getX() + "/Y" + 
+			  sign.getBlock().getY() + "/Z" + sign.getBlock().getZ());
 				if (wildcardB == null) {
 					// On the first run stop processing the wildcard and do the rest first.
 					wildcardB = sign.getBlock();
@@ -330,14 +397,14 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 		return getKeyValueForThisShortKey(key).contains(typeId) ? typeId : null;
 	}
 
-	private ArrayList<Integer> getKeyValueForThisShortKey(final String key) {
+	private ArrayList<String> getKeyValueForThisShortKey(final String key) {
 		if (!shortKeyValue.containsKey(key)) { // Compile the typeID-list only once per shortKey
 			debug("Starting new list: " + key);
-			final ArrayList<Integer> list = new ArrayList<Integer>();
+			final ArrayList<String> list = new ArrayList<String>();
 			for (final String dataValueKey : DATAVALUES.keySet()) {
 				if (dataValueKey.indexOf(key) != -1) {
 					debug("Adding to list '" + key + "': " + DATAVALUES.get(dataValueKey));
-					list.add(DATAVALUES.get(dataValueKey));
+					list.add(DATAVALUES.get(String.valueOf(dataValueKey)));
 				}
 			}
 			shortKeyValue.put(key, list);
@@ -380,7 +447,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 				return chest.getInventory().getContents();
 			else {
 				final ArrayList<ItemStack> t = new ArrayList<ItemStack>();
-				if (otherChest.getX() < block.getX() || otherChest.getZ() < block.getZ()) {
+				if (otherChest.getX() < block.getX() || 
+						otherChest.getZ() < block.getZ()) {
 					t.addAll(Arrays.asList(otherChest.getInventory().getContents()));
 					t.addAll(Arrays.asList(chest.getInventory().getContents()));
 				} else {
@@ -404,7 +472,8 @@ public class IntoChest extends JavaPlugin implements Runnable, DataValues {
 			final Chest otherChest = otherChest(block);
 			if (otherChest == null)
 				chest.getInventory().addItem(stack);
-			else if ((otherChest.getX() < block.getX()) || (otherChest.getZ() < block.getZ())) {
+			else if ((otherChest.getX() < block.getX()) || 
+					     (otherChest.getZ() < block.getZ())) {
 				if (isFull(otherChest.getInventory().getContents(), stack))
 					chest.getInventory().addItem(stack);
 				else
