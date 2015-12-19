@@ -1,0 +1,71 @@
+IntoChest Changelog
+-------------------
+1.6.0
+
+atpx takes over as developer for joghurt.
+
+-Better sign filter system!
+---Removed matching a common name filter to any item with that name.
+-----Ex: "stone" no longer will match with items like "cobblestone", stone slab, etc.
+---Deprecating support for wildcards (*) in signs.
+-----In future versions wildcards will no longer be supported until otherwise announced.
+---Support for filtering all items instead of just some. 
+---Support for filtering items with sub-types (like spruce wood vs oak wood).
+---Support filter-matching using five naming systems.
+-----Exact name: the exact name of the item ("coarse dirt")
+-------Self-explanatory. The name of the item when you hover over it ingame.
+-----Short name: the shortened, abbreviated name of the item based on its own naming convention ("cdirt")
+-------A short name of the item derived from the first letter of every word that is not the last word + the first four letters of the last word of the item.
+-----Group name: the name of a group that contains the item ("dirts")
+-------New groups have been created for items of similar types.
+-----Exact identifier: the item decimal ID and the item data value delimited by a pipe ("3|1").
+-----ID identifier: the item decimal ID only. This will match against any type of that item ("3").
+-Better debug system!
+---Overhauled debug messaging to better ascertain what is happening behind-the-scenes.
+---You can now toggle debug messages for separate systems of the plugin.
+-----general: General and miscellaneous messages
+-----filter: Sign filtering messages and what signs are being checked and if the item is allowed or not.
+-----pathing: Pathfinding messages of where the item is going.
+-----runtime: Runtime messages on how long the plugin is taking.
+---Commands
+-----"/ic debug on|off": Toggle all debug messaging.
+-----"/ic debug on|off general": Just toggle general debug messaging.
+-----"/ic debug on|off filter"
+-----"/ic debug on|off pathing"
+-----"/ic debug on|off runtime"
+-Support for inspecting items to get valid identifiers for it or allowed/invalid items on a sign.
+---Helpful for figuring out what to put on a sign in order for an item to be allowed to pass through the sign.
+---Commands
+-----"/ic inspect": Inspect the item in your hand or the sign you interact with once
+-----"/ic inspect on|off": Toggle inspect mode to be persistently on or off.
+-New help command lists available commands for IntoChest.
+---"/ic help"
+-Fixes
+---Checking if a chest is full for stackable items that do not have a max of 64. 
+
+-------------------
+1.5.1 (Skipped)
+
+-Unstable version so it is being skipped for now.
+
+-------------------
+1.5.0 (Skipped)
+
+-Unstable version so it is being skipped for now.
+-Better pathfinding algorithm.
+-Removal of wildcards.
+
+-------------------
+1.3.1
+
+-Last known stable release
+
+This plugin pushes items that lie on a Workbench automatically into a Chest or Dispenser.
+The Chest/Dispenser can be seated directly besides the Workbench or be connected to it via Redstone Wire of infinite length.
+Multiple Chests/Dispensers can be linked with Redstone Wire for in case a Chest/Dispenser is full.
+Filtering is possible using Signs within the Redstone Wire line labeled with the english name of the Block/Item (see http://www.minecraftwiki.net/wiki/Data_values ) or its decimal ID to let that type 'pass' that Sign.
+You can also use common parts of Block/Item names to group them, like "stairs" will fit for wooden, brick or stone stairs.
+Filtering multiple Blocks/Items is also possible by simply separating their names/IDs by comma.
+A nearer chest/dispenser is prefered over a more distant chest/dispenser, EXCEPT there's a sign involved: A filtered chest/dispenser is always preferred over a not filtered one!
+
+--------------------
