@@ -1,5 +1,5 @@
 name: IntoChest
-version: 1.6
+version: 1.6 Beta
 main: atpx.minecraft.IntoChest
 author: atpx, Joghurt
 description: >
@@ -23,5 +23,6 @@ description: >
   while there is a special filtered one for them.
 commands:
    intochest:
-      usage: /<command> debug|runtime on|off
+      description: IntoChest commands.
+      usage: IntoChest invalid usage. Type "/<command> help" for valid options.
       aliases: ic
