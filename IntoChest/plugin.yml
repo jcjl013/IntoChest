@@ -13,14 +13,8 @@ description: >
   the english name of the Block/Item
     (see http://www.minecraftwiki.net/wiki/Data_values ) or its decimal ID to 
     let that type 'pass' that Sign.
-  You can also use common parts of Block/Item names to group them, like 
-  "stairs" will fit for wooden, brick or stone stairs.
   Filtering multiple Blocks/Items is also possible by simply separating 
   their names/IDs by comma.
-  A single "*" on a sign means "use this path only in case nothing else 
-  matches". This is not necessary all the time but
-  a fix for if you encounter Blocks/Items in a non-filtered Chest/Dispenser 
-  while there is a special filtered one for them.
 commands:
    intochest:
       description: IntoChest commands.

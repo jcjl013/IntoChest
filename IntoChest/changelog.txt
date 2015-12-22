@@ -1,25 +1,26 @@
 IntoChest Changelog
 -------------------
-1.6.0
+1.6.0 Beta
 
 atpx takes over as developer for joghurt.
 
 -Better sign filter system!
 ---Removed matching a common name filter to any item with that name.
------Ex: "stone" no longer will match with items like "cobblestone", stone slab, etc.
+-----Ex: "stone" no longer will match with items like "cobblestone", "sandstone", etc.
 ---Deprecating support for wildcards (*) in signs.
 -----In future versions wildcards will no longer be supported until otherwise announced.
+-----Usage of wildcards was only meant as a bandaid for items that would not match.
 ---Support for filtering all items instead of just some. 
----Support for filtering items with sub-types (like spruce wood vs oak wood).
+---Support for filtering items with sub-types (like spruce wood vs. oak wood).
 ---Support filter-matching using five naming systems.
 -----Exact name: the exact name of the item ("coarse dirt")
 -------Self-explanatory. The name of the item when you hover over it ingame.
------Short name: the shortened, abbreviated name of the item based on its own naming convention ("cdirt")
--------A short name of the item derived from the first letter of every word that is not the last word + the first four letters of the last word of the item.
------Group name: the name of a group that contains the item ("dirts")
+-----Short name: the shortened, abbreviated name of the item based on a naming convention ("cdirt")
+-------A short name of the item is derived from the first letter of every word that is not the last word + the first four letters of the last word of the item.
+-----Group name: the name of a group that contains the item as part of the group ("dirts")
 -------New groups have been created for items of similar types.
------Exact identifier: the item decimal ID and the item data value delimited by a pipe ("3|1").
------ID identifier: the item decimal ID only. This will match against any type of that item ("3").
+-----Exact identifier: the item decimal ID and the item data value delimited by a pipe ("3|1" would match coarse dirt).
+-----ID identifier: the item decimal ID only. This will match against any type of that item ("3" would match with dirt, coarse dirt, and podzol).
 -Better debug system!
 ---Overhauled debug messaging to better ascertain what is happening behind-the-scenes.
 ---You can now toggle debug messages for separate systems of the plugin.
@@ -30,18 +31,19 @@ atpx takes over as developer for joghurt.
 ---Commands
 -----"/ic debug on|off": Toggle all debug messaging.
 -----"/ic debug on|off general": Just toggle general debug messaging.
------"/ic debug on|off filter"
------"/ic debug on|off pathing"
------"/ic debug on|off runtime"
+-----"/ic debug on|off filter": Just toggle filter debug messaging.
+-----"/ic debug on|off pathing": Just toggle pathing debug messaging.
+-----"/ic debug on|off runtime": Just toggle runtime debug messaging.
 -Support for inspecting items to get valid identifiers for it or allowed/invalid items on a sign.
 ---Helpful for figuring out what to put on a sign in order for an item to be allowed to pass through the sign.
 ---Commands
------"/ic inspect": Inspect the item in your hand or the sign you interact with once
+-----"/ic inspect": Inspect the item in your hand or the sign you interact with just once
 -----"/ic inspect on|off": Toggle inspect mode to be persistently on or off.
 -New help command lists available commands for IntoChest.
 ---"/ic help"
 -Fixes
----Checking if a chest is full for stackable items that do not have a max of 64. 
+---Checking if a chest is full for stackable items that do not have a max of 64 now checks correctly.
+---Misc performance improvements. 
 
 -------------------
 1.5.1 (Skipped)
